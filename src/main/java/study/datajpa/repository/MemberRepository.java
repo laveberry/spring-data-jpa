@@ -1,6 +1,8 @@
 package study.datajpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import study.datajpa.entity.Member;
 
 import java.util.List;
@@ -11,5 +13,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     //find... : 아무거나 들어가도됨, By 이후 안넣으면 전체조회
     List<Member> findTop3HelloBy();
+
+    //@Param 은 jpql을 명확하게 작성했을때 필요함(:username)
+    @Query(name = "Member.findByUsername") //이거 없어도됨
+    List<Member> findByUsername(@Param("username") String username);
 
 }
