@@ -147,4 +147,25 @@ class MemberRepositoryTest {
             System.out.println("member = " + member);
         }
     }
+
+    @Test
+    void returnType() {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> findList = memberRepository.findListByUsername("AAA");
+        Member findMember = memberRepository.findMemberByUsername("AAA");
+        Optional<Member> optional = memberRepository.findOptionalByUsername("AAA"); //동일건 2개이상 오류 발생 : IncorrectResultSizeDataAccessException
+        System.out.println("optional " + optional);
+
+        List<Member> optionalE = memberRepository.findListByUsername("sss");
+        Member optionalN = memberRepository.findMemberByUsername("sss");
+        Optional<Member> optionalY = memberRepository.findOptionalByUsername("sss");
+        System.out.println("optionalE " + optionalE); //[]
+        System.out.println("optionalN " + optionalN); //null
+        System.out.println("optionalY " + optionalY); //Optional.empty
+    }
+
 }
