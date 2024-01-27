@@ -88,7 +88,7 @@ class MemberJpaRepositoryTest {
     }
 
     @Test
-    public void paging() {
+    void 순수_JPA_paging() {
         //given
         memberJpaRepository.save(new Member("member1", 10));
         memberJpaRepository.save(new Member("member2", 10));

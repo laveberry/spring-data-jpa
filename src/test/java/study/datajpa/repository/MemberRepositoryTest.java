@@ -3,6 +3,10 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -166,6 +170,46 @@ class MemberRepositoryTest {
         System.out.println("optionalE " + optionalE); //[]
         System.out.println("optionalN " + optionalN); //null
         System.out.println("optionalY " + optionalY); //Optional.empty
+    }
+
+    @Test
+    void 스프링데이타JPA_paging() {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username")); //구현체
+//        PageRequest.of(0, 3); //sort 선택사항
+
+        //when
+        //total 카운트 쿼리 자동 생성
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+        List<Member> top3HelloBy = memberRepository.findTop3HelloBy(); //참조 top만 가져오기도 가능
+//        Slice<Member> page = memberRepository.findByAge(age, pageRequest); //slice 하면 토탈카운트 조회안함
+//        List<Member> page = memberRepository.findByAge(age, pageRequest); //단순히 데이터만 가져오기
+
+        //간단하게 model로 변환가능
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+        //then
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();
+
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+        System.out.println("totalElements = " + totalElements);
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0);
+        assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();
     }
 
 }

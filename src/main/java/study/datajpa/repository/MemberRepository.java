@@ -1,5 +1,8 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,4 +40,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findListByUsername(String username); //컬렉션
     Member findMemberByUsername(String username); //단건
     Optional<Member> findOptionalByUsername(String username); //단건 Optional
+
+    //조인이 많을떄 카운트쿼리 따로 분리하여 성능개선 가능 > 하이버네이트6 이후로는 자동최적화 되므로 fetch써야
+//    @Query(value = "select m from Member m left join m.team t",
+//            countQuery = "select count(m.username) from Member m")
+//    @Query(value = "select m from Member m left join fetch m.team t") //하이버네이트6 이후로는 자동최적화 되므로 fetch써야 join나감(불필요)
+    Page<Member> findByAge(int age, Pageable pageable);
+
+    //Slice 사용하면 토탈쿼리 조회안함
+//    Slice<Member> findByAge(int age, Pageable pageable);
+
+    //List는 단순조회
+//    List<Member> findByAge(int age, Pageable pageable);
 }
