@@ -241,4 +241,43 @@ class MemberRepositoryTest {
         assertThat(resultCount).isEqualTo(3);
     }
 
+    @Test
+    void findMemberLazy() {
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //when (N + 1 문제)
+        //select Member 1 -> EntityGraph 으로 패치조인 가능
+//        List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+
+        //기존 - 10개면 추가 team조회쿼리 10번 나감
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); //기존 - 프록시객체
+            System.out.println("member.team = " + member.getTeam().getName()); //기존 - 각각 팀 쿼리 작동
+        }
+
+        //fetch join - join 하고 select 절 데이터도 넣어줌
+//        List<Member> memberFetchJoin = memberRepository.findMemberFetchJoin();
+//
+//        for (Member member : memberFetchJoin) {
+//            System.out.println("member = " + member.getUsername());
+//            System.out.println("member.teamClass = " + member.getTeam().getClass());
+//            System.out.println("member.team = " + member.getTeam().getName());
+//        }
+    }
+
 }
