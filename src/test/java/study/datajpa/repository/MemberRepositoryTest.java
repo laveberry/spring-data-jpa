@@ -280,4 +280,33 @@ class MemberRepositoryTest {
 //        }
     }
 
+    @Test
+    void queryHint() {
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush(); //결과 db 동기화
+        em.clear(); //영속성컨텍스트 날리기
+
+        //when
+//        Member findMember = memberRepository.findById(member1.getId()).get(); //실무는 get 쓰면안됨
+        Member findMember = memberRepository.findReadOnlyByUsername("member1"); //readOnly로 성능최적화. 스냅샷 안만듬
+        findMember.setUsername("member2"); //readOnly 변경감지안함. 변경쿼리 안나감
+
+        em.flush();//readOnly 아닐시, 변경감지 등. 최적화가 되어있더라도 비용이 듬
+
+        assertThat(findMember.getUsername()).isEqualTo("member2");
+        assertThat(memberRepository.findReadOnlyByUsername("member2")).isNull();
+    }
+
+    @Test
+    void lock() {
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        //when
+        //rock - select쿼리 for update 뒤에 붙음
+        List<Member> result = memberRepository.findLockByUsername("member1");
+    }
 }
