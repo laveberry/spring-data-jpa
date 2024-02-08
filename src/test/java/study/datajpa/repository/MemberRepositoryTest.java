@@ -309,4 +309,10 @@ class MemberRepositoryTest {
         //rock - select쿼리 for update 뒤에 붙음
         List<Member> result = memberRepository.findLockByUsername("member1");
     }
+
+    //사용자정의 메소드
+    @Test
+    void callCustom() {
+        List<Member> result = memberRepository.findMemberCustom();
+    }
 }
