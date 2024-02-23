@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 //MemberRepositoryCustom 인터페이스 상속 추가
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom, JpaSpecificationExecutor<Member> {
     //이름으로 회원찾기 - 도메인에 특화된 기능은 공통으로 만들기 불가. 구현하지않아도 springDataJpa가 작동시킴(쿼리메소드기능)
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
